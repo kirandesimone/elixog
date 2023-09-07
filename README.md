@@ -5,7 +5,7 @@
 
   *This is a project from the Dockyard Academy Elixir course*
 
-  It's is a blog project that uses Elixir, Pheonix, Ecto, and PostgreSQL
+  It's a blog built with Elixir, Phoenix, Ecto, and PostgreSQL
 
 ## ERDiagram
 
