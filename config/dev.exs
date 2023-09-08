@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :elixog, Elixog.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "postgres1",
   hostname: "localhost",
   database: "elixog_dev",
   stacktrace: true,
