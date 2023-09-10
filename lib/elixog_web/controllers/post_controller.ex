@@ -4,6 +4,11 @@ defmodule ElixogWeb.PostController do
   alias Elixog.Posts
   alias Elixog.Posts.Post
 
+  def index(conn, %{"search" => title}) do
+    searched_posts = Posts.search_for_post(title)
+    render(conn, :index, posts: searched_posts)
+  end
+
   def index(conn, _params) do
     posts = Posts.list_posts()
     render(conn, :index, posts: posts)
@@ -59,4 +64,5 @@ defmodule ElixogWeb.PostController do
     |> put_flash(:info, "Post deleted successfully.")
     |> redirect(to: ~p"/posts")
   end
+
 end

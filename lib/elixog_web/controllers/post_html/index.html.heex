@@ -7,6 +7,13 @@
   </:actions>
 </.header>
 
+<.simple_form :let={f} for={@conn}>
+  <.input field={f[:search]} type="text" label="Search" />
+  <:actions>
+    <.button> Go </.button>
+  </:actions>
+</.simple_form>
+
 <.table id="posts" rows={@posts} row_click={&JS.navigate(~p"/posts/#{&1}")}>
   <:col :let={post} label="Title"><%= post.title %></:col>
   <:col :let={post} label="Subtitle"><%= post.subtitle %></:col>

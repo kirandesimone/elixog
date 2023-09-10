@@ -101,4 +101,21 @@ defmodule Elixog.Posts do
   def change_post(%Post{} = post, attrs \\ %{}) do
     Post.changeset(post, attrs)
   end
+
+  @doc """
+  Returns ALL posts that have the same title
+
+  ## Examples
+
+      iex> search_for_post("title")
+      [%Post{}]
+
+  """
+  def search_for_post(title) do
+    search = "%#{title}%"
+
+    Post
+    |> where([p], ilike(p.title, ^search))
+    |> Repo.all()
+  end
 end
