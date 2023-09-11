@@ -4,7 +4,8 @@ defmodule Elixog.Posts.Post do
 
   schema "posts" do
     field :content, :string
-    field :subtitle, :string
+    field :published_on, :date
+    field :visible, :boolean
     field :title, :string
 
     timestamps()
@@ -13,7 +14,7 @@ defmodule Elixog.Posts.Post do
   @doc false
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:title, :subtitle, :content])
-    |> validate_required([:title, :subtitle, :content])
+    |> cast(attrs, [:title, :published_on, :visible, :content])
+    |> validate_required([:title, :published_on, :visible, :content])
   end
 end

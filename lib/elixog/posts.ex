@@ -18,7 +18,9 @@ defmodule Elixog.Posts do
 
   """
   def list_posts do
-    Repo.all(Post)
+    Post
+    |> order_by([p], [desc: p.inserted_at])
+    |>Repo.all()
   end
 
   @doc """
@@ -50,8 +52,10 @@ defmodule Elixog.Posts do
 
   """
   def create_post(attrs \\ %{}) do
+    modified_attrs = Map.put(attrs, "published_on", Date.from_iso8601!(attrs["published_on"]))
+
     %Post{}
-    |> Post.changeset(attrs)
+    |> Post.changeset(modified_attrs)
     |> Repo.insert()
   end
 
