@@ -3,9 +3,14 @@ defmodule ElixogWeb.PostControllerTest do
 
   import Elixog.PostsFixtures
 
-  @create_attrs %{content: "some content", subtitle: "some subtitle", title: "some title"}
-  @update_attrs %{content: "some updated content", subtitle: "some updated subtitle", title: "some updated title"}
-  @invalid_attrs %{content: nil, subtitle: nil, title: nil}
+  @create_attrs %{content: "some content", published_on: "2023-09-11", visible: true, title: "some title"}
+  @update_attrs %{
+    content: "some updated content",
+    published_on: "2023-09-12",
+    visible: true,
+    title: "some updated title"
+  }
+  @invalid_attrs %{content: nil, published_on: nil, visible: nil, title: nil}
 
   describe "index" do
     test "lists all posts", %{conn: conn} do

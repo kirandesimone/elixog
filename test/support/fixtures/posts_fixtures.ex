@@ -12,7 +12,8 @@ defmodule Elixog.PostsFixtures do
       attrs
       |> Enum.into(%{
         content: "some content",
-        subtitle: "some subtitle",
+        published_on: "2023-09-11",
+        visible: true,
         title: "some title"
       })
       |> Elixog.Posts.create_post()

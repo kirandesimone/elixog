@@ -64,5 +64,4 @@ defmodule ElixogWeb.PostController do
     |> put_flash(:info, "Post deleted successfully.")
     |> redirect(to: ~p"/posts")
   end
-
 end

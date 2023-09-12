@@ -19,6 +19,7 @@ defmodule Elixog.Posts do
   """
   def list_posts do
     Post
+    |> where([p], p.visible)
     |> order_by([p], [desc: p.inserted_at])
     |>Repo.all()
   end
@@ -52,10 +53,9 @@ defmodule Elixog.Posts do
 
   """
   def create_post(attrs \\ %{}) do
-    modified_attrs = Map.put(attrs, "published_on", Date.from_iso8601!(attrs["published_on"]))
-
+    #atom_attrs = key_to_atom(attrs)
     %Post{}
-    |> Post.changeset(modified_attrs)
+    |> Post.changeset(attrs)
     |> Repo.insert()
   end
 
@@ -121,5 +121,12 @@ defmodule Elixog.Posts do
     Post
     |> where([p], ilike(p.title, ^search))
     |> Repo.all()
+  end
+
+  def key_to_atom(map) do
+    Enum.reduce(map, %{}, fn
+      {key, value}, acc when is_atom(key) -> Map.put(acc, key, value)
+      {key, value}, acc when is_binary(key) -> Map.put(acc, String.to_existing_atom(key), value)
+    end)
   end
 end
