@@ -38,7 +38,12 @@ defmodule Elixog.Posts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_post!(id), do: Repo.get!(Post, id)
+  def get_post!(id) do
+    Post
+    |> join(:left, [p], c in assoc(p, :comments))
+    |> preload([p, c], [comments: c])
+    |> Repo.get!(id)
+  end
 
   @doc """
   Creates a post.
@@ -123,10 +128,10 @@ defmodule Elixog.Posts do
     |> Repo.all()
   end
 
-  def key_to_atom(map) do
-    Enum.reduce(map, %{}, fn
-      {key, value}, acc when is_atom(key) -> Map.put(acc, key, value)
-      {key, value}, acc when is_binary(key) -> Map.put(acc, String.to_existing_atom(key), value)
-    end)
-  end
+  #def key_to_atom(map) do
+  #  Enum.reduce(map, %{}, fn
+  #    {key, value}, acc when is_atom(key) -> Map.put(acc, key, value)
+  #    {key, value}, acc when is_binary(key) -> Map.put(acc, String.to_existing_atom(key), value)
+  #  end)
+  #end
 end

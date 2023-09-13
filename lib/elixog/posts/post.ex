@@ -7,6 +7,7 @@ defmodule Elixog.Posts.Post do
     field :published_on, :date
     field :visible, :boolean
     field :title, :string
+    has_many :comments, Elixog.Comments.Comment
 
     timestamps()
   end

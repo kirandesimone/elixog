@@ -7,6 +7,7 @@ defmodule Elixog.PostsTest do
     alias Elixog.Posts.Post
 
     import Elixog.PostsFixtures
+    import Elixog.CommentsFixtures
 
     @invalid_attrs %{content: nil, published_on: nil, visible: nil, title: nil}
 
@@ -27,9 +28,10 @@ defmodule Elixog.PostsTest do
       assert Posts.list_posts() == []
     end
 
-    test "get_post!/1 returns the post with given id" do
+    test "get_post!/1 returns the post with given id and associated comments" do
       post = post_fixture()
-      assert Posts.get_post!(post.id) == post
+      comment = comment_fixture(post_id: post.id)
+      assert Posts.get_post!(post.id).comments == [comment]
     end
 
     test "create_post/1 with valid data creates a post" do

@@ -11,6 +11,18 @@
 <.list>
   <:item title="Title"><%= @post.title %></:item>
   <:item title="Content"><%= @post.content %></:item>
+  <:item title="Published On"><%= @post.published_on %></:item>
 </.list>
 
+<.simple_form :let={f} for={@changeset} action={~p"/posts"}>
+  <.input field={f[:post_id]} type="hidden" value={@post.id} />
+  <.input field={f[:content]} type="text" label="Content" />
+  <:actions>
+    <.button> Comment </.button>
+  </:actions>
+</.simple_form>
+
+<.table id="comments" rows={@post.comments}>
+  <:col :let={comment}><%= comment.content %></:col>
+</.table>
 <.back navigate={~p"/posts"}>Back to posts</.back>

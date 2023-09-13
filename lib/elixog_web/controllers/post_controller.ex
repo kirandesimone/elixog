@@ -1,6 +1,8 @@
 defmodule ElixogWeb.PostController do
   use ElixogWeb, :controller
 
+  alias Elixog.Comments
+  alias Elixog.Comments.Comment
   alias Elixog.Posts
   alias Elixog.Posts.Post
 
@@ -31,9 +33,22 @@ defmodule ElixogWeb.PostController do
     end
   end
 
+  def create(conn, %{"comment" => comment_params}) do
+    case Comments.create_comment(comment_params) do
+      {:ok, comment} ->
+        conn
+        |> put_flash(:info, "Comment created successfully.")
+        |> redirect(to: ~p"/posts/#{comment.post_id}")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, :show, changeset: changeset)
+    end
+  end
+
   def show(conn, %{"id" => id}) do
     post = Posts.get_post!(id)
-    render(conn, :show, post: post)
+    changeset = Comments.change_comment(%Comment{})
+    render(conn, :show, post: post, changeset: changeset)
   end
 
   def edit(conn, %{"id" => id}) do
