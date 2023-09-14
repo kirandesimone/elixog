@@ -2,6 +2,7 @@ defmodule Elixog.PostsTest do
   use Elixog.DataCase
 
   alias Elixog.Posts
+  alias Elixog.Comments
 
   describe "posts" do
     alias Elixog.Posts.Post
@@ -13,7 +14,7 @@ defmodule Elixog.PostsTest do
 
     test "list_posts/0 returns all posts" do
       post = post_fixture()
-      assert Posts.list_posts() == [post]
+      assert Posts.list_posts() == [Repo.preload(post, :comments)]
     end
 
     test "list_posts/0 returns empty with false visibility" do
@@ -35,7 +36,12 @@ defmodule Elixog.PostsTest do
     end
 
     test "create_post/1 with valid data creates a post" do
-      valid_attrs = %{content: "some content", published_on: "2023-09-12", visible: true, title: "some title"}
+      valid_attrs = %{
+        content: "some content",
+        published_on: "2023-09-12",
+        visible: true,
+        title: "some title"
+      }
 
       assert {:ok, %Post{} = post} = Posts.create_post(valid_attrs)
       assert post.content == "some content"
@@ -66,15 +72,17 @@ defmodule Elixog.PostsTest do
     end
 
     test "update_post/2 with invalid data returns error changeset" do
-      post = post_fixture()
+      post = Repo.preload(post_fixture(), :comments)
       assert {:error, %Ecto.Changeset{}} = Posts.update_post(post, @invalid_attrs)
       assert post == Posts.get_post!(post.id)
     end
 
     test "delete_post/1 deletes the post" do
       post = post_fixture()
+      comment = comment_fixture(post_id: post.id)
       assert {:ok, %Post{}} = Posts.delete_post(post)
       assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+      assert_raise Ecto.NoResultsError, fn -> Comments.get_comment!(comment.id) end
     end
 
     test "change_post/1 returns a post changeset" do

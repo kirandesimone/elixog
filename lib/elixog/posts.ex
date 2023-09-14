@@ -19,9 +19,11 @@ defmodule Elixog.Posts do
   """
   def list_posts do
     Post
+    |> join(:left, [p], c in assoc(p, :comments))
     |> where([p], p.visible)
-    |> order_by([p], [desc: p.inserted_at])
-    |>Repo.all()
+    |> preload([p, c], comments: c)
+    |> order_by([p], desc: p.inserted_at)
+    |> Repo.all()
   end
 
   @doc """
@@ -41,7 +43,7 @@ defmodule Elixog.Posts do
   def get_post!(id) do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
-    |> preload([p, c], [comments: c])
+    |> preload([p, c], comments: c)
     |> Repo.get!(id)
   end
 
@@ -58,7 +60,7 @@ defmodule Elixog.Posts do
 
   """
   def create_post(attrs \\ %{}) do
-    #atom_attrs = key_to_atom(attrs)
+    # atom_attrs = key_to_atom(attrs)
     %Post{}
     |> Post.changeset(attrs)
     |> Repo.insert()
@@ -128,10 +130,10 @@ defmodule Elixog.Posts do
     |> Repo.all()
   end
 
-  #def key_to_atom(map) do
+  # def key_to_atom(map) do
   #  Enum.reduce(map, %{}, fn
   #    {key, value}, acc when is_atom(key) -> Map.put(acc, key, value)
   #    {key, value}, acc when is_binary(key) -> Map.put(acc, String.to_existing_atom(key), value)
   #  end)
-  #end
+  # end
 end
