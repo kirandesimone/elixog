@@ -9,6 +9,7 @@ defmodule Elixog.AccountsFixtures do
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
+      username: "tester_account",
       email: unique_user_email(),
       password: valid_user_password()
     })

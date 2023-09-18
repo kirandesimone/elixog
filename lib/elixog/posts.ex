@@ -43,7 +43,7 @@ defmodule Elixog.Posts do
   def get_post!(id) do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
-    |> preload([p, c], comments: c)
+    |> preload([p, c], [:user, comments: {c, :user}])
     |> Repo.get!(id)
   end
 

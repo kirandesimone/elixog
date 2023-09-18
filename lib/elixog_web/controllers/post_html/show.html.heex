@@ -2,13 +2,16 @@
   Post <%= @post.id %>
   <:subtitle>This is a post record from your database.</:subtitle>
   <:actions>
-    <.link href={~p"/posts/#{@post}/edit"}>
-      <.button>Edit post</.button>
-    </.link>
+    <%= if assigns[:current_user] && @post.user_id == assigns[:current_user] do %>
+      <.link href={~p"/posts/#{@post}/edit"}>
+        <.button>Edit post</.button>
+      </.link>
+    <% end %>
   </:actions>
 </.header>
 
 <.list>
+  <:item title="Username"><%= @post.user.username %></:item>
   <:item title="Title"><%= @post.title %></:item>
   <:item title="Content"><%= @post.content %></:item>
   <:item title="Published On"><%= @post.published_on %></:item>
@@ -23,9 +26,12 @@
       <.button>Comment</.button>
     </:actions>
   </.simple_form>
+<% else %>
+  <p>To comment on a post, sign-in or create an account!</p>
 <% end %>
 
 <.table id="comments" rows={@post.comments}>
+  <:col :let={comment}><%= comment.user.username %></:col>
   <:col :let={comment}><%= comment.content %></:col>
 </.table>
 <.back navigate={~p"/posts"}>Back to posts</.back>

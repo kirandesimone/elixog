@@ -2,8 +2,10 @@ defmodule ElixogWeb.PostControllerTest do
   use ElixogWeb.ConnCase
 
   import Elixog.PostsFixtures
+  import Elixog.AccountsFixtures
 
   @create_attrs %{
+    user_id: 0,
     content: "some content",
     published_on: "2023-09-11",
     visible: true,
@@ -28,14 +30,19 @@ defmodule ElixogWeb.PostControllerTest do
 
   describe "new post" do
     test "renders form", %{conn: conn} do
-      conn = get(conn, ~p"/posts/new")
+      user = user_fixture()
+
+      conn = conn |> log_in_user(user) |> get(~p"/posts/new")
       assert html_response(conn, 200) =~ "New Post"
     end
   end
 
   describe "create post" do
     test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/posts", post: @create_attrs)
+      user = user_fixture()
+
+      conn =
+        conn |> log_in_user(user) |> post(~p"/posts", post: %{@create_attrs | user_id: user.id})
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == ~p"/posts/#{id}"
@@ -45,42 +52,50 @@ defmodule ElixogWeb.PostControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/posts", post: @invalid_attrs)
+      user = user_fixture()
+
+      conn = conn |> log_in_user(user) |> post(~p"/posts", post: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Post"
     end
   end
 
   describe "edit post" do
-    setup [:create_post]
+    test "renders form for editing chosen post", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
 
-    test "renders form for editing chosen post", %{conn: conn, post: post} do
-      conn = get(conn, ~p"/posts/#{post}/edit")
+      conn = conn |> log_in_user(user) |> get(~p"/posts/#{post}/edit")
       assert html_response(conn, 200) =~ "Edit Post"
     end
   end
 
   describe "update post" do
-    setup [:create_post]
+    test "redirects when data is valid", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
 
-    test "redirects when data is valid", %{conn: conn, post: post} do
-      conn = put(conn, ~p"/posts/#{post}", post: @update_attrs)
+      conn = conn |> log_in_user(user) |> put(~p"/posts/#{post}", post: @update_attrs)
       assert redirected_to(conn) == ~p"/posts/#{post}"
 
       conn = get(conn, ~p"/posts/#{post}")
       assert html_response(conn, 200) =~ "some updated content"
     end
 
-    test "renders errors when data is invalid", %{conn: conn, post: post} do
-      conn = put(conn, ~p"/posts/#{post}", post: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+
+      conn = conn |> log_in_user(user) |> put(~p"/posts/#{post}", post: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Post"
     end
   end
 
   describe "delete post" do
-    setup [:create_post]
+    test "deletes chosen post", %{conn: conn} do
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
 
-    test "deletes chosen post", %{conn: conn, post: post} do
-      conn = delete(conn, ~p"/posts/#{post}")
+      conn = conn |> log_in_user(user) |> delete(~p"/posts/#{post}")
       assert redirected_to(conn) == ~p"/posts"
 
       assert_error_sent 404, fn ->
@@ -89,8 +104,8 @@ defmodule ElixogWeb.PostControllerTest do
     end
   end
 
-  defp create_post(_) do
-    post = post_fixture()
-    %{post: post}
-  end
+  # defp create_post(_) do
+  # post = post_fixture()
+  # %{post: post}
+  # end
 end

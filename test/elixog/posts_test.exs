@@ -9,16 +9,21 @@ defmodule Elixog.PostsTest do
 
     import Elixog.PostsFixtures
     import Elixog.CommentsFixtures
+    import Elixog.AccountsFixtures
 
     @invalid_attrs %{content: nil, published_on: nil, visible: nil, title: nil}
 
     test "list_posts/0 returns all posts" do
-      post = post_fixture()
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
       assert Posts.list_posts() == [Repo.preload(post, :comments)]
     end
 
     test "list_posts/0 returns empty with false visibility" do
+      user = user_fixture()
+
       false_attr = %{
+        user_id: user.id,
         content: "false test",
         title: "false post",
         visible: false,
@@ -30,13 +35,17 @@ defmodule Elixog.PostsTest do
     end
 
     test "get_post!/1 returns the post with given id and associated comments" do
-      post = post_fixture()
-      comment = comment_fixture(post_id: post.id)
+      user = user_fixture()
+      post = Repo.preload(post_fixture(user_id: user.id), [:user, comments: [:user]])
+      comment = Repo.preload(comment_fixture(user_id: user.id, post_id: post.id), :user)
       assert Posts.get_post!(post.id).comments == [comment]
     end
 
     test "create_post/1 with valid data creates a post" do
+      user = user_fixture()
+
       valid_attrs = %{
+        user_id: user.id,
         content: "some content",
         published_on: "2023-09-12",
         visible: true,
@@ -55,7 +64,8 @@ defmodule Elixog.PostsTest do
     end
 
     test "update_post/2 with valid data updates the post" do
-      post = post_fixture()
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
 
       update_attrs = %{
         "content" => "some updated content",
@@ -72,21 +82,25 @@ defmodule Elixog.PostsTest do
     end
 
     test "update_post/2 with invalid data returns error changeset" do
-      post = Repo.preload(post_fixture(), :comments)
-      assert {:error, %Ecto.Changeset{}} = Posts.update_post(post, @invalid_attrs)
-      assert post == Posts.get_post!(post.id)
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+      pre_load_post = Repo.preload(post, [:user, comments: [:user]])
+      assert {:error, %Ecto.Changeset{}} = Posts.update_post(pre_load_post, @invalid_attrs)
+      assert pre_load_post == Posts.get_post!(post.id)
     end
 
     test "delete_post/1 deletes the post" do
-      post = post_fixture()
-      comment = comment_fixture(post_id: post.id)
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
+      comment = comment_fixture(user_id: user.id, post_id: post.id)
       assert {:ok, %Post{}} = Posts.delete_post(post)
       assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
       assert_raise Ecto.NoResultsError, fn -> Comments.get_comment!(comment.id) end
     end
 
     test "change_post/1 returns a post changeset" do
-      post = post_fixture()
+      user = user_fixture()
+      post = post_fixture(user_id: user.id)
       assert %Ecto.Changeset{} = Posts.change_post(post)
     end
   end
