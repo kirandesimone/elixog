@@ -7,17 +7,20 @@ defmodule Elixog.Posts.Post do
     field :published_on, :date
     field :visible, :boolean
     field :title, :string
+
     has_many :comments, Elixog.Comments.Comment
+    many_to_many :tags, Elixog.Tags.Tag, join_through: "posts_tags", on_replace: :delete
     belongs_to :user, Elixog.Accounts.User
 
     timestamps()
   end
 
   @doc false
-  def changeset(post, attrs) do
+  def changeset(post, attrs, tags \\ []) do
     post
     |> cast(attrs, [:title, :published_on, :visible, :content, :user_id])
     |> validate_required([:title, :visible, :content, :user_id])
     |> foreign_key_constraint(:user_id)
+    |> put_assoc(:tags, tags)
   end
 end

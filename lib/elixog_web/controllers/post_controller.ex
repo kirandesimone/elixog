@@ -5,6 +5,7 @@ defmodule ElixogWeb.PostController do
   alias Elixog.Comments.Comment
   alias Elixog.Posts
   alias Elixog.Posts.Post
+  alias Elixog.Tags
 
   plug :require_user_owns_post when action in [:edit, :update, :delete]
 
@@ -19,19 +20,29 @@ defmodule ElixogWeb.PostController do
   end
 
   def new(conn, _params) do
-    changeset = Posts.change_post(%Post{})
-    render(conn, :new, changeset: changeset, current_user: conn.assigns[:current_user])
+    changeset = Posts.change_post(%Post{tags: []})
+
+    render(conn, :new,
+      changeset: changeset,
+      current_user: conn.assigns[:current_user],
+      tag_options: tag_options()
+    )
   end
 
   def create(conn, %{"post" => post_params}) do
-    case Posts.create_post(post_params) do
+    tags = Map.get(post_params, "tag_id", []) |> Enum.map(&Tags.get_tag!/1)
+
+    case Posts.create_post(post_params, tags) do
       {:ok, post} ->
         conn
         |> put_flash(:info, "Post created successfully.")
         |> redirect(to: ~p"/posts/#{post}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :new, changeset: changeset)
+        render(conn, :new,
+          changeset: changeset,
+          tag_options: tag_options(Enum.map(tags, & &1.id))
+        )
     end
   end
 
@@ -65,14 +76,16 @@ defmodule ElixogWeb.PostController do
     render(conn, :edit,
       post: post,
       changeset: changeset,
-      current_user: conn.assigns[:current_user]
+      current_user: conn.assigns[:current_user],
+      tag_options: tag_options(Enum.map(post.tags, & &1.id))
     )
   end
 
   def update(conn, %{"id" => id, "post" => post_params}) do
+    tags = Map.get(post_params, "tag_ids", []) |> Enum.map(&Tags.get_tag!/1)
     post = Posts.get_post!(id)
 
-    case Posts.update_post(post, post_params) do
+    case Posts.update_post(post, post_params, tags) do
       {:ok, post} ->
         conn
         |> put_flash(:info, "Post updated successfully.")
@@ -105,4 +118,9 @@ defmodule ElixogWeb.PostController do
       |> halt()
     end
   end
+
+  defp tag_options(selected_tags \\ []),
+    do:
+      Tags.list_tags()
+      |> Enum.map(fn tag -> [key: tag.name, value: 1, selected: tag.id in selected_tags] end)
 end

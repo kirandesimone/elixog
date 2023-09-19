@@ -21,7 +21,7 @@ defmodule Elixog.Posts do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
     |> where([p], p.visible)
-    |> preload([p, c], comments: c)
+    |> preload([p, c], [:tags, comments: c])
     |> order_by([p], desc: p.inserted_at)
     |> Repo.all()
   end
@@ -59,10 +59,10 @@ defmodule Elixog.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_post(attrs \\ %{}) do
+  def create_post(attrs \\ %{}, tags \\ []) do
     # atom_attrs = key_to_atom(attrs)
     %Post{}
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, tags)
     |> Repo.insert()
   end
 
@@ -78,9 +78,9 @@ defmodule Elixog.Posts do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_post(%Post{} = post, attrs) do
+  def update_post(%Post{} = post, attrs, tags \\ []) do
     post
-    |> Post.changeset(attrs)
+    |> Post.changeset(attrs, tags)
     |> Repo.update()
   end
 

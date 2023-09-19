@@ -7,6 +7,7 @@
   <.input field={f[:content]} type="text" label="Content" />
   <.input field={f[:published_on]} type="date" label="Publish Date" />
   <.input field={f[:visible]} type="hidden" value="true" />
+  <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
   <:actions>
     <.button>Save Post</.button>
   </:actions>
