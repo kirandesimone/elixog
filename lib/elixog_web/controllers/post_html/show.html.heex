@@ -15,9 +15,11 @@
   <:item title="Title"><%= @post.title %></:item>
   <:item title="Content"><%= @post.content %></:item>
   <:item title="Published On"><%= @post.published_on %></:item>
-  <%= for tag <- @post.tags do %>
-    <span><%= tag.name %></span>
-  <% end %>
+  <:item title="Tags">
+    <%= for tag <- @post.tags do %>
+      <span><%= tag.name %>,</span>
+    <% end %>
+  </:item>
 </.list>
 
 <%= if assigns[:current_user] do %>

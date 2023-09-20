@@ -17,6 +17,17 @@ defmodule Elixog.Posts do
       [%Post{}, ...]
 
   """
+  def list_posts(title) do
+    search = "%#{title}%"
+
+    Post
+    |> join(:left, [p], c in assoc(p, :comments))
+    |> where([p], p.visible and ilike(p.title, ^search))
+    |> preload([p, c], [:tags, comments: c])
+    |> order_by([p], desc: p.inserted_at)
+    |> Repo.all()
+  end
+
   def list_posts do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
@@ -43,7 +54,7 @@ defmodule Elixog.Posts do
   def get_post!(id) do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
-    |> preload([p, c], [:user, comments: {c, :user}])
+    |> preload([p, c], [:user, :tags, comments: {c, :user}])
     |> Repo.get!(id)
   end
 
@@ -122,13 +133,7 @@ defmodule Elixog.Posts do
       [%Post{}]
 
   """
-  def search_for_post(title) do
-    search = "%#{title}%"
 
-    Post
-    |> where([p], ilike(p.title, ^search))
-    |> Repo.all()
-  end
 
   # def key_to_atom(map) do
   #  Enum.reduce(map, %{}, fn

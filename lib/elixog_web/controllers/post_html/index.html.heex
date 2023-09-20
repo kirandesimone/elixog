@@ -10,9 +10,9 @@
 </.header>
 
 <.simple_form :let={f} for={%{}} method="get" action={~p"/posts"}>
-  <.input field={f[:search]} type="text" label="Search Post" />
+  <.input field={f[:search]} type="text" />
   <:actions>
-    <.button>Go</.button>
+    <.button>Search</.button>
   </:actions>
 </.simple_form>
 

@@ -10,7 +10,11 @@ defmodule ElixogWeb.PostController do
   plug :require_user_owns_post when action in [:edit, :update, :delete]
 
   def index(conn, %{"search" => title}) do
-    searched_posts = Posts.search_for_post(title)
+    if title == "" do
+      redirect(conn, to: ~p"/posts")
+    end
+
+    searched_posts = Posts.list_posts(title)
     render(conn, :index, posts: searched_posts)
   end
 
@@ -122,5 +126,5 @@ defmodule ElixogWeb.PostController do
   defp tag_options(selected_tags \\ []),
     do:
       Tags.list_tags()
-      |> Enum.map(fn tag -> [key: tag.name, value: 1, selected: tag.id in selected_tags] end)
+      |> Enum.map(fn tag -> [key: tag.name, value: tag.id, selected: tag.id in selected_tags] end)
 end
