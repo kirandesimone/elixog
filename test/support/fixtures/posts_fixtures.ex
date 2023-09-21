@@ -7,7 +7,7 @@ defmodule Elixog.PostsFixtures do
   @doc """
   Generate a post.
   """
-  def post_fixture(attrs \\ %{}) do
+  def post_fixture(attrs \\ %{}, tags \\ []) do
     {:ok, post} =
       attrs
       |> Enum.into(%{
@@ -16,7 +16,7 @@ defmodule Elixog.PostsFixtures do
         visible: true,
         title: "some title"
       })
-      |> Elixog.Posts.create_post()
+      |> Elixog.Posts.create_post(tags)
 
     post
   end

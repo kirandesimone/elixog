@@ -10,7 +10,8 @@ defmodule ElixogWeb.PostControllerTest do
     published_on: "2023-09-11",
     visible: true,
     title: "some title",
-    comments: []
+    comments: [],
+    tag_ids: []
   }
   @update_attrs %{
     content: "some updated content",
@@ -19,7 +20,14 @@ defmodule ElixogWeb.PostControllerTest do
     title: "some updated title",
     comments: []
   }
-  @invalid_attrs %{content: nil, published_on: nil, visible: nil, title: nil, comments: nil}
+  @invalid_attrs %{
+    content: nil,
+    published_on: nil,
+    visible: nil,
+    title: nil,
+    comments: nil,
+    tag_ids: []
+  }
 
   describe "index" do
     test "lists all posts", %{conn: conn} do
@@ -103,9 +111,4 @@ defmodule ElixogWeb.PostControllerTest do
       end
     end
   end
-
-  # defp create_post(_) do
-  # post = post_fixture()
-  # %{post: post}
-  # end
 end

@@ -134,7 +134,6 @@ defmodule Elixog.Posts do
 
   """
 
-
   # def key_to_atom(map) do
   #  Enum.reduce(map, %{}, fn
   #    {key, value}, acc when is_atom(key) -> Map.put(acc, key, value)

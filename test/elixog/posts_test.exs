@@ -6,10 +6,12 @@ defmodule Elixog.PostsTest do
 
   describe "posts" do
     alias Elixog.Posts.Post
+    alias Elixog.Tags.Tag
 
     import Elixog.PostsFixtures
     import Elixog.CommentsFixtures
     import Elixog.AccountsFixtures
+    import Elixog.TagsFixtures
 
     @invalid_attrs %{content: nil, published_on: nil, visible: nil, title: nil}
 
@@ -59,6 +61,34 @@ defmodule Elixog.PostsTest do
       assert post.title == "some title"
     end
 
+    test "create_post/1 with tags" do
+      user = user_fixture()
+      tag1 = tag_fixture()
+      tag2 = tag_fixture()
+
+      valid_attrs1 = %{
+        content: "post 1",
+        title: "title post 1",
+        visible: true,
+        published_on: "2023-03-01",
+        user_id: user.id
+      }
+
+      valid_attrs2 = %{
+        content: "post 2",
+        title: "title post 2",
+        visible: true,
+        published_on: "2023-05-08",
+        user_id: user.id
+      }
+
+      assert {:ok, %Post{} = post1} = Posts.create_post(valid_attrs1, [tag1, tag2])
+      assert {:ok, %Post{} = post2} = Posts.create_post(valid_attrs2, [tag2])
+
+      assert Repo.preload(post1, :tags).tags == [tag1, tag2]
+      assert Repo.preload(post2, :tags).tags == [tag2]
+    end
+
     test "create_post/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Posts.create_post(@invalid_attrs)
     end
@@ -81,6 +111,28 @@ defmodule Elixog.PostsTest do
       assert post.title == "some updated title"
     end
 
+    test "update_post/2 with tags" do
+      user = user_fixture()
+      tag1 = tag_fixture()
+      tag2 = tag_fixture()
+      post = post_fixture(%{user_id: user.id}, [tag1])
+
+      update_attrs = %{
+        content: "Updated Content",
+        title: "Updated Title",
+        visible: true,
+        published_on: "2023-10-10"
+      }
+
+      assert {:ok, %Post{} = post} = Posts.update_post(post, update_attrs, [tag2])
+      assert post.content == "Updated Content"
+      assert post.title == "Updated Title"
+      assert post.visible == true
+      assert post.published_on == ~D[2023-10-10]
+
+      assert Repo.preload(post, :tags).tags == [tag2]
+    end
+
     test "update_post/2 with invalid data returns error changeset" do
       user = user_fixture()
       post = post_fixture(user_id: user.id)
@@ -96,6 +148,18 @@ defmodule Elixog.PostsTest do
       assert {:ok, %Post{}} = Posts.delete_post(post)
       assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
       assert_raise Ecto.NoResultsError, fn -> Comments.get_comment!(comment.id) end
+    end
+
+    test "delete_post/1 deletes a post with tags" do
+      user = user_fixture()
+      tag = tag_fixture()
+      post = post_fixture(%{user_id: user.id}, [tag])
+
+      query = from p in Post, join: t in assoc(p, :tags), on: t.id == ^tag.id
+
+      assert {:ok, %Post{} = post} = Posts.delete_post(post)
+      assert_raise Ecto.NoResultsError, fn -> Posts.get_post!(post.id) end
+      refute Repo.exists?(query)
     end
 
     test "change_post/1 returns a post changeset" do

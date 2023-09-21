@@ -96,7 +96,7 @@ defmodule ElixogWeb.PostController do
         |> redirect(to: ~p"/posts/#{post}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :edit, post: post, changeset: changeset)
+        render(conn, :edit, post: post, changeset: changeset, tag_options: tag_options())
     end
   end
 
