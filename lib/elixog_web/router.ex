@@ -20,13 +20,13 @@ defmodule ElixogWeb.Router do
   scope "/", ElixogWeb do
     pipe_through [:browser, :require_authenticated_user]
 
-    get "/", PageController, :home
     resources "/posts", PostController, only: [:edit, :new, :delete, :create, :update]
   end
 
   scope "/", ElixogWeb do
     pipe_through :browser
 
+    get "/", PageController, :home
     get "/posts", PostController, :index
     get "/posts/:id", PostController, :show
   end
