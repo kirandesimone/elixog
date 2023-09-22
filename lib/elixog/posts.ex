@@ -32,7 +32,7 @@ defmodule Elixog.Posts do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
     |> where([p], p.visible)
-    |> preload([p, c], [:tags, comments: c])
+    |> preload([p, c], [:tags, :cover_image, comments: c])
     |> order_by([p], desc: p.inserted_at)
     |> Repo.all()
   end
@@ -54,7 +54,7 @@ defmodule Elixog.Posts do
   def get_post!(id) do
     Post
     |> join(:left, [p], c in assoc(p, :comments))
-    |> preload([p, c], [:user, :tags, comments: {c, :user}])
+    |> preload([p, c], [:user, :cover_image, :tags, comments: {c, :user}])
     |> Repo.get!(id)
   end
 
@@ -91,6 +91,7 @@ defmodule Elixog.Posts do
   """
   def update_post(%Post{} = post, attrs, tags \\ []) do
     post
+    |> Repo.preload(:cover_image)
     |> Post.changeset(attrs, tags)
     |> Repo.update()
   end

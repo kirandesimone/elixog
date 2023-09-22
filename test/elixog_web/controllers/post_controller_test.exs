@@ -4,6 +4,9 @@ defmodule ElixogWeb.PostControllerTest do
   import Elixog.PostsFixtures
   import Elixog.AccountsFixtures
 
+  alias Elixog.CoverImages.CoverImage
+  alias Elixog.Posts
+
   @create_attrs %{
     user_id: 0,
     content: "some content",
@@ -11,7 +14,10 @@ defmodule ElixogWeb.PostControllerTest do
     visible: true,
     title: "some title",
     comments: [],
-    tag_ids: []
+    tag_ids: [],
+    cover_image: %{
+      url: "https://example.com/image.png"
+    }
   }
   @update_attrs %{
     content: "some updated content",
@@ -80,7 +86,9 @@ defmodule ElixogWeb.PostControllerTest do
   describe "update post" do
     test "redirects when data is valid", %{conn: conn} do
       user = user_fixture()
-      post = post_fixture(user_id: user.id)
+
+      post =
+        post_fixture(user_id: user.id, cover_image: %{url: "https://www.example.com/image.png"})
 
       conn = conn |> log_in_user(user) |> put(~p"/posts/#{post}", post: @update_attrs)
       assert redirected_to(conn) == ~p"/posts/#{post}"

@@ -8,6 +8,9 @@
   <.input field={f[:published_on]} type="date" label="Publish Date" />
   <.input field={f[:visible]} type="hidden" value="true" />
   <.input field={f[:tag_ids]} type="select" label="Tags" multiple={true} options={@tag_options} />
+  <.inputs_for :let={cover_image} field={f[:cover_image]}>
+    <.input type="text" field={cover_image[:url]} label="Cover Image URL" />
+  </.inputs_for>
   <:actions>
     <.button>Save Post</.button>
   </:actions>

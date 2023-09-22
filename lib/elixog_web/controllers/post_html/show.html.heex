@@ -10,6 +10,8 @@
   </:actions>
 </.header>
 
+<img src={@post.cover_image.url} alt="post cover image" />
+
 <.list>
   <:item title="Username"><%= @post.user.username %></:item>
   <:item title="Title"><%= @post.title %></:item>
