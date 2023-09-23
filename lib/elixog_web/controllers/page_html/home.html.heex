@@ -1,9 +1,20 @@
 <.flash_group flash={@flash} />
-
-<div class="relative h-32 w-32">
-  <div class="absolute bottom-0 right-0">
-    <h1 class="text-xl font-medium">
-      ELIXOG
-    </h1>
+<section>
+  <div class="grid grid-cols-2 h-96">
+    <div class="flex flex-col justify-center items-center">
+      <h1 class="text-6xl italic font-bold">
+        ELIXOG
+      </h1>
+      <p class="pt-5 text-lg">
+        Your Journey Starts Here
+      </p>
+    </div>
+    <div class="flex flex-col justify-end items-start">
+      <.button>
+        <.link navigate={~p"/posts"}>
+          Start Reading
+        </.link>
+      </.button>
+    </div>
   </div>
-</div>
+</section>
